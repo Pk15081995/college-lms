@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Notifications</h1>
+  <p>Updates about your leave requests and approvals</p>
+</div>
+<div class="card">
+  {% if notes %}
+  {% for n in notes %}
+  <div style="padding:14px 0;border-bottom:1px solid rgba(39,44,58,.6)">
+    <div style="display:flex;justify-content:space-between;align-items:start;gap:10px">
+      <div>
+        <div style="font-weight:600;font-size:14px">{{ n.title }}</div>
+        <div style="color:var(--muted);font-size:13px;margin-top:4px">{{ n.message }}</div>
+      </div>
+      <div style="color:var(--muted);font-size:11px;white-space:nowrap">{{ n.created_at.strftime('%d %b, %H:%M') }}</div>
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <div class="empty-state"><div class="ei">🔔</div>No notifications yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

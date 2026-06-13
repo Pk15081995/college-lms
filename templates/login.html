@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Login — College Leave Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--surface:#181b24;--border:#272c3a;--accent:#4f8ef7;--accent2:#7c6af5;--text:#e8eaf0;--muted:#7a7f94;--danger:#ef4444;--success:#22c55e;--gradient:linear-gradient(135deg,#4f8ef7,#7c6af5)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:radial-gradient(ellipse at 60% 20%,#1a1f3a 0%,#0f1117 70%);min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--text);padding:20px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:44px;width:430px;max-width:100%}
+.logo{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{font-size:12px;color:var(--muted);margin-top:4px;margin-bottom:30px;letter-spacing:.5px}
+label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+input{width:100%;background:#0f1117;border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-size:14px;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s}
+input:focus{border-color:var(--accent)}
+.field{margin-bottom:17px}
+.btn{display:block;width:100%;padding:12px;background:var(--gradient);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.btn:hover{opacity:.9}
+.flash{padding:11px 14px;border-radius:8px;font-size:13px;margin-bottom:15px;background:#2a1515;border:1px solid #3a1f1f;color:var(--danger)}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">🎓 College LMS</div>
+  <div class="sub">ONLINE LEAVE MANAGEMENT SYSTEM</div>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}<div class="flash">{{ msg }}</div>{% endfor %}
+  {% endwith %}
+  <form method="POST">
+    <div class="field"><label>Email Address</label><input type="email" name="email" placeholder="your.email@college.edu" required autofocus/></div>
+    <div class="field"><label>Password</label><input type="password" name="password" placeholder="Enter password" required/></div>
+    <button type="submit" class="btn">Sign In →</button>
+  </form>
+</div>
+</body>
+</html>

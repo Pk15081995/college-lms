@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Students{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Manage Students</h1>
+  <p>Add, view, and remove student accounts</p>
+</div>
+
+<div class="card" style="max-width:680px">
+  <div class="card-header"><h2>Add New Student</h2></div>
+  <form method="POST">
+    <div class="grid-2">
+      <div class="field"><label>Full Name</label><input type="text" name="name" required/></div>
+      <div class="field"><label>Email</label><input type="email" name="email" required/></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Password</label><input type="password" name="password" required/></div>
+      <div class="field"><label>Roll Number</label><input type="text" name="roll_no" required/></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Course</label>
+        <select name="course"><option>MCA</option><option>BCA</option><option>MBA</option><option>BBA</option><option>B.Tech</option></select>
+      </div>
+      <div class="field"><label>Semester</label>
+        <select name="semester"><option>Sem 1</option><option>Sem 2</option><option>Sem 3</option><option>Sem 4</option><option>Sem 5</option><option>Sem 6</option></select>
+      </div>
+    </div>
+    <div class="field"><label>Class Advisor (Faculty)</label>
+      <select name="faculty_id"><option value="">— None —</option>
+        {% for f in faculty %}<option value="{{ f.id }}">{{ f.user.name }} ({{ f.department }})</option>{% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Student</button>
+  </form>
+</div>
+
+<div class="card">
+  <div class="card-header"><h2>All Students ({{ students|length }})</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Roll No</th><th>Email</th><th>Course</th><th>Sem</th><th>Advisor</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for s in students %}
+      <tr>
+        <td><strong>{{ s.user.name }}</strong></td>
+        <td style="color:var(--muted)">{{ s.roll_no }}</td>
+        <td style="color:var(--muted)">{{ s.user.email }}</td>
+        <td>{{ s.course }}</td>
+        <td>{{ s.semester }}</td>
+        <td>{{ s.advisor.user.name if s.advisor else '—' }}</td>
+        <td><a class="btn btn-danger btn-sm" href="/delete-user/{{ s.user.id }}" onclick="return confirm('Delete {{ s.user.name }}?')">Delete</a></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

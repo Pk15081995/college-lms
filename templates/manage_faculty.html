@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Faculty{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Manage Faculty</h1>
+  <p>Add, view, and remove faculty accounts</p>
+</div>
+
+<div class="card" style="max-width:620px">
+  <div class="card-header"><h2>Add New Faculty</h2></div>
+  <form method="POST">
+    <div class="grid-2">
+      <div class="field"><label>Full Name</label><input type="text" name="name" required/></div>
+      <div class="field"><label>Email</label><input type="email" name="email" required/></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Password</label><input type="password" name="password" required/></div>
+      <div class="field"><label>Department</label>
+        <select name="department"><option>MCA</option><option>BCA</option><option>MBA</option><option>Computer Science</option><option>Management</option></select>
+      </div>
+    </div>
+    <div class="field"><label>Designation</label>
+      <select name="designation"><option>Assistant Professor</option><option>Associate Professor</option><option>Professor</option><option>Lecturer</option></select>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Faculty</button>
+  </form>
+</div>
+
+<div class="card">
+  <div class="card-header"><h2>All Faculty ({{ faculty|length }})</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Email</th><th>Department</th><th>Designation</th><th>Students</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for f in faculty %}
+      <tr>
+        <td><strong>{{ f.user.name }}</strong></td>
+        <td style="color:var(--muted)">{{ f.user.email }}</td>
+        <td>{{ f.department }}</td>
+        <td>{{ f.designation }}</td>
+        <td>{{ f.advisees|length }}</td>
+        <td><a class="btn btn-danger btn-sm" href="/delete-user/{{ f.user.id }}" onclick="return confirm('Delete {{ f.user.name }}?')">Delete</a></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

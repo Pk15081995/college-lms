@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Leave Verification</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1117;--surface:#181b24;--border:#272c3a;--accent:#4f8ef7;--text:#e8eaf0;--muted:#7a7f94;--success:#22c55e;--danger:#ef4444}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:radial-gradient(ellipse at 50% 0%,#1a1f3a 0%,#0f1117 70%);min-height:100vh;display:flex;align-items:center;justify-content:center;color:var(--text);padding:20px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:38px;width:440px;max-width:100%;text-align:center}
+.icon{font-size:56px;margin-bottom:14px}
+h1{font-family:'Space Grotesk',sans-serif;font-size:22px;margin-bottom:6px}
+.badge{display:inline-block;padding:5px 16px;border-radius:20px;font-size:13px;font-weight:700;margin:12px 0}
+.valid{background:#152a1e;color:var(--success);border:1px solid #1f3a28}
+.invalid{background:#2a1515;color:var(--danger);border:1px solid #3a1f1f}
+.info{text-align:left;margin-top:20px;border-top:1px solid var(--border);padding-top:18px}
+.row{display:flex;justify-content:space-between;padding:7px 0;font-size:14px;border-bottom:1px solid rgba(39,44,58,.5)}
+.row:last-child{border-bottom:none}.row .l{color:var(--muted)}.row .v{font-weight:600}
+</style>
+</head>
+<body>
+<div class="card">
+  {% if leave and leave.status == 'approved' %}
+    <div class="icon">✅</div>
+    <h1>Verified Leave</h1>
+    <div class="badge valid">APPROVED & VALID</div>
+    <div class="info">
+      <div class="row"><span class="l">Student</span><span class="v">{{ leave.student.user.name }}</span></div>
+      <div class="row"><span class="l">Roll No</span><span class="v">{{ leave.student.roll_no }}</span></div>
+      <div class="row"><span class="l">Leave Type</span><span class="v">{{ leave.leave_type.name }}</span></div>
+      <div class="row"><span class="l">From</span><span class="v">{{ leave.from_date.strftime('%d %b %Y') }}</span></div>
+      <div class="row"><span class="l">To</span><span class="v">{{ leave.to_date.strftime('%d %b %Y') }}</span></div>
+      <div class="row"><span class="l">Days</span><span class="v">{{ leave.days }}</span></div>
+    </div>
+  {% elif leave %}
+    <div class="icon">⚠️</div>
+    <h1>Leave Not Approved</h1>
+    <div class="badge invalid">STATUS: {{ leave.status.replace('_',' ').upper() }}</div>
+    <p style="color:var(--muted);font-size:13px;margin-top:10px">This leave request has not received final approval.</p>
+  {% else %}
+    <div class="icon">❌</div>
+    <h1>Invalid QR Code</h1>
+    <div class="badge invalid">NOT FOUND</div>
+    <p style="color:var(--muted);font-size:13px;margin-top:10px">No leave record matches this verification token.</p>
+  {% endif %}
+</div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Approve Requests{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Leave Requests — Faculty Approval</h1>
+  <p>Review and forward leave requests from your students to the HOD</p>
+</div>
+<div class="card">
+  <div class="card-header"><h2>Pending Your Approval ({{ leaves|length }})</h2></div>
+  {% if leaves %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Student</th><th>Roll No</th><th>Type</th><th>Dates</th><th>Days</th><th>Reason</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for l in leaves %}
+      <tr>
+        <td><strong>{{ l.student.user.name }}</strong></td>
+        <td style="color:var(--muted)">{{ l.student.roll_no }}</td>
+        <td><span class="tag">{{ l.leave_type.name }}</span></td>
+        <td>{{ l.from_date.strftime('%d %b') }} – {{ l.to_date.strftime('%d %b') }}</td>
+        <td>{{ l.days }}</td>
+        <td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)">{{ l.reason }}</td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-success btn-sm" onclick="act({{ l.id }},'approve','{{ l.student.user.name }}')">✓ Approve</button>
+          <button class="btn btn-danger btn-sm" onclick="act({{ l.id }},'reject','{{ l.student.user.name }}')">✗ Reject</button>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="ei">✅</div>No pending requests. All caught up!</div>
+  {% endif %}
+</div>
+
+<div class="modal-overlay" id="amodal">
+  <div class="modal-box">
+    <h2 id="atitle">Action</h2>
+    <form method="POST" id="aform">
+      <div class="field"><label>Comment (optional)</label><textarea name="comment" rows="3" placeholder="Add a comment..."></textarea></div>
+      <input type="hidden" name="action" id="aaction"/>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" onclick="closeA()">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="abtn">Confirm</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+function act(id, action, name){
+  document.getElementById('aform').action = '/faculty/action/' + id;
+  document.getElementById('aaction').value = action;
+  document.getElementById('atitle').textContent = (action==='approve'?'Approve':'Reject') + ' — ' + name;
+  const b = document.getElementById('abtn');
+  b.textContent = action==='approve' ? 'Approve & Forward to HOD' : 'Reject Leave';
+  b.className = 'btn ' + (action==='approve'?'btn-success':'btn-danger');
+  document.getElementById('amodal').classList.add('open');
+}
+function closeA(){ document.getElementById('amodal').classList.remove('open'); }
+document.getElementById('amodal').addEventListener('click',function(e){if(e.target===this)closeA();});
+</script>
+{% endblock %}

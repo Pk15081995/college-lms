@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: college-lms
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python init_db.py && gunicorn app:app --workers 2 --bind 0.0.0.0:$PORT
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: college-lms-db
+          property: connectionString
+
+databases:
+  - name: college-lms-db
+    plan: free
+    databaseName: collegelms
+    user: collegelms

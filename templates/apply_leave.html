@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Apply Leave{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Apply for Leave</h1>
+  <p>Submit a new leave request — it will go to your faculty advisor first, then HOD</p>
+</div>
+<div class="card" style="max-width:560px">
+  <form method="POST">
+    <div class="field">
+      <label>Leave Type</label>
+      <select name="leave_type" required>
+        {% for t in types %}<option value="{{ t.id }}">{{ t.name }} (max {{ t.max_days }} days)</option>{% endfor %}
+      </select>
+    </div>
+    <div class="grid-2">
+      <div class="field">
+        <label>From Date</label>
+        <input type="date" name="from_date" id="from_date" min="{{ today }}" required/>
+      </div>
+      <div class="field">
+        <label>To Date</label>
+        <input type="date" name="to_date" id="to_date" min="{{ today }}" required/>
+      </div>
+    </div>
+    <div class="field" id="days_display" style="display:none">
+      <label>Total Days</label>
+      <div style="font-size:20px;font-weight:700;font-family:'Space Grotesk';color:var(--accent)" id="days_count">0</div>
+    </div>
+    <div class="field">
+      <label>Reason</label>
+      <textarea name="reason" rows="4" placeholder="Provide a clear reason for your leave..." required></textarea>
+    </div>
+    <div style="display:flex;gap:12px">
+      <button type="submit" class="btn btn-primary">Submit Request</button>
+      <a href="/my-leaves" class="btn btn-ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+<script>
+  const today = "{{ today }}";
+  const f = document.getElementById('from_date');
+  const t = document.getElementById('to_date');
+  const disp = document.getElementById('days_display');
+  const cnt = document.getElementById('days_count');
+
+  // default both to today on first load
+  if(!f.value) f.value = today;
+  if(!t.value) t.value = today;
+
+  function showDays(){
+    if(f.value && t.value){
+      const d = Math.round((new Date(t.value) - new Date(f.value)) / 86400000) + 1;
+      if(d > 0){
+        cnt.textContent = d + (d > 1 ? ' days' : ' day');
+        disp.style.display = 'block';
+      } else {
+        disp.style.display = 'none';
+      }
+    }
+  }
+
+  // When From Date changes: only nudge To Date if it is now earlier than From.
+  // The To Date field always stays fully editable.
+  f.addEventListener('change', function(){
+    if(t.value && t.value < f.value){ t.value = f.value; }
+    showDays();
+  });
+
+  // To Date is freely selectable for any day on/after today.
+  t.addEventListener('change', showDays);
+
+  showDays();
+</script>
+{% endblock %}

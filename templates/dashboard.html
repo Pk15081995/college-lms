@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Welcome, {{ current_user.name.split()[0] }} 👋</h1>
+  <p>
+    {% if current_user.role == 'student' %}Track and apply for your leave requests
+    {% elif current_user.role == 'faculty' %}Review leave requests from your students
+    {% else %}Overview of all leave activity across the college{% endif %}
+  </p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-label">Total Requests</div><div class="stat-value c-blue">{{ stats.total }}</div><div class="stat-sub">{% if current_user.role=='student' %}Applied by you{% else %}All requests{% endif %}</div></div>
+  <div class="stat-card"><div class="stat-label">Approved</div><div class="stat-value c-green">{{ stats.approved }}</div><div class="stat-sub">Fully approved</div></div>
+  <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value c-yellow">{{ stats.pending }}</div><div class="stat-sub">Awaiting action</div></div>
+  <div class="stat-card"><div class="stat-label">Rejected</div><div class="stat-value c-red">{{ stats.rejected }}</div><div class="stat-sub">Declined</div></div>
+</div>
+
+{% if extra %}
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-label">Students</div><div class="stat-value c-blue">{{ extra.students }}</div><div class="stat-sub">Registered</div></div>
+  <div class="stat-card"><div class="stat-label">Faculty</div><div class="stat-value c-blue">{{ extra.faculty }}</div><div class="stat-sub">Members</div></div>
+  <div class="stat-card"><div class="stat-label">Awaiting Final Approval</div><div class="stat-value c-yellow">{{ extra.awaiting_hod }}</div><div class="stat-sub">Needs HOD action</div></div>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-header">
+    <h2>Recent Leave Requests</h2>
+    {% if current_user.role == 'student' %}<a href="/apply" class="btn btn-primary btn-sm">+ Apply Leave</a>{% endif %}
+  </div>
+  {% if recent %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        {% if current_user.role != 'student' %}<th>Student</th>{% endif %}
+        <th>Type</th><th>From</th><th>To</th><th>Days</th><th>Status</th>
+      </tr></thead>
+      <tbody>
+      {% for l in recent %}
+      <tr>
+        {% if current_user.role != 'student' %}<td>{{ l.student.user.name }}</td>{% endif %}
+        <td><span class="tag">{{ l.leave_type.name }}</span></td>
+        <td>{{ l.from_date.strftime('%d %b %Y') }}</td>
+        <td>{{ l.to_date.strftime('%d %b %Y') }}</td>
+        <td>{{ l.days }}</td>
+        <td><span class="status st-{{ l.status }}">{{ l.status.replace('_',' ') }}</span></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="ei">📭</div>No leave requests yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

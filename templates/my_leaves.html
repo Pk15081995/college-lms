@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}My Leaves{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>My Leave Requests</h1>
+  <p>Track the status of all your leave applications</p>
+</div>
+<div class="card">
+  <div class="card-header">
+    <h2>All Requests ({{ leaves|length }})</h2>
+    <a href="/apply" class="btn btn-primary btn-sm">+ Apply Leave</a>
+  </div>
+  {% if leaves %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Type</th><th>Dates</th><th>Days</th><th>Workflow</th><th>Applied</th><th>Actions</th></tr></thead>
+      <tbody>
+      {% for l in leaves %}
+      <tr>
+        <td><span class="tag">{{ l.leave_type.name }}</span></td>
+        <td>{{ l.from_date.strftime('%d %b') }} – {{ l.to_date.strftime('%d %b %Y') }}</td>
+        <td>{{ l.days }}</td>
+        <td>
+          <div class="workflow">
+            {% if l.status == 'rejected' %}
+              <span class="wf-step reject">Rejected</span>
+            {% elif l.status == 'cancelled' %}
+              <span class="wf-step">Cancelled</span>
+            {% else %}
+              <span class="wf-step {% if l.status in ['faculty_approved','approved'] %}done{% elif l.status=='pending_faculty' %}active{% endif %}">Faculty</span>
+              <span class="wf-arrow">→</span>
+              <span class="wf-step {% if l.status=='approved' %}done{% elif l.status=='faculty_approved' %}active{% endif %}">HOD</span>
+            {% endif %}
+          </div>
+        </td>
+        <td style="color:var(--muted)">{{ l.applied_on.strftime('%d %b') }}</td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="viewLeave({{ loop.index0 }})">View</button>
+          <a class="btn btn-ghost btn-sm" href="/leave/{{ l.id }}/pdf">PDF</a>
+          {% if l.status in ['pending_faculty','faculty_approved'] %}
+          <a class="btn btn-danger btn-sm" href="/cancel/{{ l.id }}" onclick="return confirm('Cancel this leave request?')">Cancel</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state"><div class="ei">📭</div>No leave requests yet. <a href="/apply" style="color:var(--accent)">Apply now</a></div>
+  {% endif %}
+</div>
+
+<div class="modal-overlay" id="vmodal">
+  <div class="modal-box">
+    <h2>Leave Details</h2>
+    <div id="vbody"></div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeV()">Close</button></div>
+  </div>
+</div>
+<script>
+const data = [
+  {% for l in leaves %}
+  { type:"{{ l.leave_type.name }}", from:"{{ l.from_date.strftime('%d %b %Y') }}", to:"{{ l.to_date.strftime('%d %b %Y') }}",
+    days:{{ l.days }}, reason:`{{ l.reason|replace('`','') }}`, status:"{{ l.status.replace('_',' ') }}",
+    fc:`{{ l.faculty_comment|replace('`','') }}`, hc:`{{ l.hod_comment|replace('`','') }}`,
+    id:{{ l.id }}, approved:{{ 'true' if l.status=='approved' else 'false' }} }{% if not loop.last %},{% endif %}
+  {% endfor %}
+];
+function viewLeave(i){
+  const l = data[i];
+  document.getElementById('vbody').innerHTML = `
+    <div style="display:grid;gap:13px">
+      <div class="grid-2">
+        <div><div class="stat-label">Type</div><span class="tag">${l.type}</span></div>
+        <div><div class="stat-label">Status</div><span style="text-transform:capitalize">${l.status}</span></div>
+      </div>
+      <div class="grid-2">
+        <div><div class="stat-label">From</div>${l.from}</div>
+        <div><div class="stat-label">To</div>${l.to}</div>
+      </div>
+      <div><div class="stat-label">Days</div>${l.days}</div>
+      <div><div class="stat-label">Reason</div><span style="color:var(--muted)">${l.reason}</span></div>
+      ${l.fc?`<div><div class="stat-label">Faculty Comment</div><span style="color:var(--muted)">${l.fc}</span></div>`:''}
+      ${l.hc?`<div><div class="stat-label">HOD Comment</div><span style="color:var(--muted)">${l.hc}</span></div>`:''}
+      ${l.approved?`<div style="text-align:center;margin-top:8px"><div class="stat-label">QR Verification</div><img src="/leave/${l.id}/qr" style="width:140px;height:140px;background:#fff;padding:8px;border-radius:10px;margin-top:6px"/></div>`:''}
+    </div>`;
+  document.getElementById('vmodal').classList.add('open');
+}
+function closeV(){ document.getElementById('vmodal').classList.remove('open'); }
+document.getElementById('vmodal').addEventListener('click',function(e){if(e.target===this)closeV();});
+</script>
+{% endblock %}
